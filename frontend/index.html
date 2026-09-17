@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Study Buddy – Personalized AI Learning Assistant</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">🎓</div>
+        <div class="brand-text">
+          <h2>AI Study Buddy</h2>
+          <span class="badge badge-accent">AI Learning Hub</span>
+        </div>
+        <button class="mobile-close-btn" id="mobile-close-btn" aria-label="Close menu">✕</button>
+      </div>
+
+      <!-- Active Material Quick Selector in Sidebar -->
+      <div class="sidebar-active-mat">
+        <label for="sidebar-mat-select">Active Material:</label>
+        <select id="sidebar-mat-select" class="form-select">
+          <option value="">No material selected</option>
+        </select>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="#dashboard" class="nav-link active" data-section="dashboard"><span class="icon">📊</span> Dashboard</a></li>
+          <li><a href="#materials" class="nav-link" data-section="materials"><span class="icon">📚</span> Library & Upload</a></li>
+          <li><a href="#summary" class="nav-link" data-section="summary"><span class="icon">📝</span> AI Summary Notes</a></li>
+          <li><a href="#questions" class="nav-link" data-section="questions"><span class="icon">🎯</span> Exam Questions</a></li>
+          <li><a href="#quiz" class="nav-link" data-section="quiz"><span class="icon">⚡</span> Dynamic Quiz</a></li>
+          <li><a href="#flashcards" class="nav-link" data-section="flashcards"><span class="icon">🃏</span> 3D Flashcards</a></li>
+          <li><a href="#tutor" class="nav-link" data-section="tutor"><span class="icon">💬</span> Context AI Tutor</a></li>
+          <li><a href="#planner" class="nav-link" data-section="planner"><span class="icon">📅</span> Date-Aware Planner</a></li>
+          <li><a href="#exam" class="nav-link" data-section="exam"><span class="icon">🔥</span> Exam Crash Mode</a></li>
+          <li><a href="#progress" class="nav-link" data-section="progress"><span class="icon">📈</span> Analytics & Topics</a></li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="engine-badge" id="sidebar-engine-badge" style="cursor: pointer;" title="Click to manage AI connection">
+          <span class="status-dot" id="sidebar-status-dot" style="background-color: #ea580c; box-shadow: 0 0 6px #ea580c;"></span>
+          <span id="sidebar-status-text">AI Offline (Local Fallback)</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Navigation Bar -->
+      <header class="topbar">
+        <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle navigation">☰</button>
+        <div class="search-container">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="global-search-input" placeholder="Search materials, questions, key concepts..." aria-label="Search">
+          <div id="search-results-dropdown" class="search-dropdown hidden"></div>
+        </div>
+        <div class="topbar-actions" style="display: flex; align-items: center; gap: 8px;">
+          <div id="ai-status-pill" class="ai-status-pill offline" title="Click to view or configure AI connection status">
+            <span id="ai-status-pulse-dot" class="status-pulse-dot offline"></span>
+            <span id="ai-status-text">AI Offline (Local)</span>
+          </div>
+          <button class="btn btn-sm btn-connect-online" id="btn-connect-online" title="Connect Google Gemini or OpenAI API to go online">
+            ⚡ Connect Online
+          </button>
+          <button class="btn btn-outline btn-sm" id="btn-ai-settings" title="Configure AI API Keys">⚙️ AI Settings</button>
+          <button class="btn btn-primary btn-sm" id="btn-quick-upload">+ Upload Material</button>
+        </div>
+      </header>
+
+      <!-- Active Material Notification Banner -->
+      <div id="active-material-banner" class="active-banner hidden">
+        <div class="banner-content">
+          <span class="banner-icon">📖</span>
+          <span class="banner-label">Active Document:</span>
+          <strong id="active-material-title">No document chosen</strong>
+          <span id="active-material-stats" class="text-muted"></span>
+        </div>
+        <div class="banner-actions">
+          <button class="btn btn-outline btn-xs" id="btn-preview-active">Preview Text</button>
+        </div>
+      </div>
+
+      <div class="content-body">
+        <!-- 1. DASHBOARD -->
+        <section id="section-dashboard" class="content-section active">
+          <div class="section-header">
+            <div>
+              <h1>Welcome to AI Study Buddy</h1>
+              <p class="section-desc">Transform your lecture notes, slides, and textbooks into personalized mastery workflows.</p>
+            </div>
+          </div>
+
+          <!-- Live AI Connection Status Banner on Dashboard -->
+          <div id="dashboard-ai-banner" class="dashboard-ai-banner offline">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <span style="font-size: 24px;" id="dashboard-ai-banner-icon">📡</span>
+              <div>
+                <strong id="dashboard-ai-banner-title" style="font-size: 0.95rem;">Current Mode: Offline Heuristics (Local Parser)</strong>
+                <p id="dashboard-ai-banner-desc" style="margin: 3px 0 0 0; font-size: 0.83rem; opacity: 0.9;">
+                  Summaries and questions are running offline with basic text splitting. Connect a free Google Gemini key to activate 10x smarter AI reasoning.
+                </p>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-connect-online" id="btn-dashboard-connect-online">
+              ⚡ Connect Online
+            </button>
+          </div>
+
+          <!-- Weak Topic Recommendation Alert -->
+          <div id="weak-topic-alert" class="alert alert-warning hidden">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-body">
+              <strong>Revision Alert:</strong> You have weak topics identified from recent quizzes: <span id="weak-topic-list"></span>.
+              <a href="#summary" class="alert-link" data-section="summary">Review summaries now &rarr;</a>
+            </div>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon purple">📚</div>
+              <div class="stat-info">
+                <h3 id="stat-materials-count">0</h3>
+                <p>Study Materials</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon indigo">⚡</div>
+              <div class="stat-info">
+                <h3 id="stat-quiz-accuracy">0%</h3>
+                <p>Average Quiz Score</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green">🃏</div>
+              <div class="stat-info">
+                <h3 id="stat-flashcards-mastered">0</h3>
+                <p>Flashcards Mastered</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon orange">⏱️</div>
+              <div class="stat-info">
+                <h3 id="stat-study-time">0m</h3>
+                <p>Total Study Time</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions Grid -->
+          <h2 class="sub-heading">Quick Actions</h2>
+          <div class="quick-actions-grid">
+            <div class="action-card" data-action="upload">
+              <div class="action-icon">📤</div>
+              <h3>Upload Materials</h3>
+              <p>Add PDF, DOCX, or TXT lecture notes.</p>
+            </div>
+            <div class="action-card" data-action="summary">
+              <div class="action-icon">📝</div>
+              <h3>Generate Notes</h3>
+              <p>Synthesize concepts, definitions, and formulas.</p>
+            </div>
+            <div class="action-card" data-action="quiz">
+              <div class="action-icon">⚡</div>
+              <h3>Start AI Quiz</h3>
+              <p>Test active recall with timed MCQs.</p>
+            </div>
+            <div class="action-card" data-action="exam">
+              <div class="action-icon">🔥</div>
+              <h3>Exam Crash Mode</h3>
+              <p>Adaptive preparation for 0.5h, 2h, or 6h deadlines.</p>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; margin-bottom: 12px;">
+            <h2 class="sub-heading" style="margin: 0;">Recent Learning Activity</h2>
+            <button class="btn btn-outline btn-xs text-danger" id="btn-clear-dashboard-history" title="Clear learning activity history">
+              🗑️ Clear History
+            </button>
+          </div>
+          <div class="card">
+            <div id="recent-activity-list" class="activity-timeline">
+              <p class="text-muted">No recent activities yet. Upload your first document to get started!</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. MATERIALS LIBRARY & UPLOAD -->
+        <section id="section-materials" class="content-section">
+          <div class="section-header">
+            <div>
+              <h1>Study Materials Library</h1>
+              <p class="section-desc">Manage lecture notes, slides, and textbooks with multi-file sequential upload and collision-proof storage.</p>
+            </div>
+          </div>
+
+          <!-- Dropzone -->
+          <div class="upload-dropzone" id="upload-dropzone">
+            <div class="dropzone-inner">
+              <div class="dropzone-icon">📁</div>
+              <h3>Drag and drop your study files here</h3>
+              <p class="text-muted">Supports PDF, DOCX, TXT, MD (Up to 32MB each)</p>
+              <input type="file" id="file-input" multiple accept=".pdf,.docx,.doc,.txt,.md" class="hidden">
+              <button class="btn btn-primary" id="btn-select-files">Select Files</button>
+            </div>
+          </div>
+
+          <!-- Upload Progress -->
+          <div id="upload-progress-container" class="upload-progress-container hidden">
+            <div class="progress-info">
+              <span id="upload-status-text">Uploading files...</span>
+              <span id="upload-percent-text">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div id="upload-progress-bar" class="progress-bar-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <!-- Materials Grid -->
+          <div class="library-toolbar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2>Your Uploaded Documents (<span id="materials-count-badge">0</span>)</h2>
+            <button class="btn btn-outline btn-sm text-danger" id="btn-reset-library" title="Clear all materials and start fresh">🧹 Clear Library</button>
+          </div>
+          <div id="materials-grid" class="materials-grid">
+            <!-- Cards rendered dynamically -->
+          </div>
+        </section>
+
+        <!-- 3. AI SUMMARY NOTES -->
+        <section id="section-summary" class="content-section">
+          <div class="section-header">
+            <div>
+              <h1>AI Summary & Revision Notes</h1>
+              <p class="section-desc">Key concepts, formal definitions, extracted formulas, and high-yield exam takeaways.</p>
+            </div>
+            <div class="header-actions">
+              <div class="btn-group" id="summary-type-group">
+                <button class="btn btn-outline btn-sm active" data-type="quick">Quick (30s)</button>
+                <button class="btn btn-outline btn-sm" data-type="medium">Medium</button>
+                <button class="btn btn-outline btn-sm" data-type="detailed">Detailed</button>
+              </div>
+              <button class="btn btn-primary btn-sm" id="btn-generate-summary">⚡ Generate Summary</button>
+              <button class="btn btn-outline btn-sm" id="btn-copy-summary">📋 Copy</button>
+              <button class="btn btn-outline btn-sm" id="btn-export-summary">💾 Export Markdown</button>
+            </div>
+          </div>
+
+          <div id="summary-content-area" class="summary-container">
+            <div class="empty-state">
+              <span class="empty-icon">📝</span>
+              <h3>No Summary Generated Yet</h3>
+              <p>Select a material and click "Generate Summary" to extract structured study notes.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. IMPORTANT QUESTIONS ENGINE -->
+        <section id="section-questions" class="content-section">
+          <div class="section-header">
+            <div>
+              <h1>Exam-Oriented Important Questions</h1>
+              <p class="section-desc">Curated 2-Mark definitions, 5-Mark explanatory workflows, and 10-Mark essay prompts with marking guides.</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-primary btn-sm" id="btn-generate-questions">⚡ Generate Questions</button>
+            </div>
+          </div>
+
+          <!-- Question Tabs -->
+          <div class="tab-bar">
+            <button class="tab-btn active" data-tab="all">All Questions</button>
+            <button class="tab-btn" data-tab="2">2-Mark (Definitions)</button>
+            <button class="tab-btn" data-tab="5">5-Mark (Explanations)</button>
+            <button class="tab-btn" data-tab="10">10-Mark (In-Depth Essays)</button>
+          </div>
+
+          <div id="questions-list-container" class="questions-list">
+            <div class="empty-state">
+              <span class="empty-icon">🎯</span>
+              <h3>No Questions Generated Yet</h3>
+              <p>Generate high-probability questions with grading criteria directly from your notes.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. DYNAMIC AI QUIZ ENGINE -->
+        <section id="section-quiz" class="content-section">
+          <div class="section-header">
+            <div>
+              <h1>Dynamic AI Quiz Engine</h1>
+              <p class="section-desc">Active recall testing with randomized options, live timer, and diagnostic topic categorization.</p>
+            </div>
+            <div class="header-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <div id="quiz-ai-indicator" class="quiz-ai-indicator" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; font-size: 0.78rem; font-weight: 600; border-radius: 999px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; cursor: pointer;" title="Dynamic questions powered by Google Gemini AI. Click to manage settings.">
+                <span>✨</span><span id="quiz-ai-indicator-text">Gemini AI Active</span>
+              </div>
+              <select id="quiz-style-select" class="form-input" style="width: auto; padding: 6px 12px; font-size: 0.85rem; background: #fff; cursor: pointer; border-color: #c7d2fe; font-weight: 500;">
+                <option value="creative" selected>🌟 Creative & Scenarios</option>
+                <option value="traps">🎯 Conceptual Traps</option>
+                <option value="dynamics">⚡ System Dynamics</option>
+                <option value="scenario">🔬 Case Studies</option>
+                <option value="mix">🎲 Comprehensive Mix</option>
+              </select>
+              <select id="quiz-count-select" class="form-input" style="width: auto; padding: 6px 12px; font-size: 0.85rem; background: #fff; cursor: pointer;">
+                <option value="5">5 Questions</option>
+                <option value="10" selected>10 Questions</option>
+                <option value="15">15 Questions</option>
+              </select>
+              <select id="quiz-difficulty-select" class="form-input" style="width: auto; padding: 6px 12px; font-size: 0.85rem; background: #fff; cursor: pointer;">
+                <option value="Medium" selected>Medium Difficulty</option>
+                <option value="Easy">Easy</option>
+                <option value="Hard">Hard</option>
+              </select>
+              <button class="btn btn-primary btn-sm" id="btn-new-quiz">🎲 Start Quiz</button>
+            </div>
+          </div>
+
+          <!-- Quiz Arena -->
+          <div id="quiz-arena" class="quiz-arena">
+            <div class="empty-state">
+              <span class="empty-icon">⚡</span>
+              <h3>Ready to test your knowledge?</h3>
+              <p>Generate a dynamic 5-question multiple choice quiz with instant explanations.</p>
+              <button class="btn btn-primary" id="btn-start-quiz-empty">Start Quiz</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. INTERACTIVE 3D FLASHCARDS -->
+        <section id="section-flashcards" class="content-section">
+          <div class="section-header">
+            <div>
+              <h1>Interactive 3D Flashcards</h1>
+              <p class="section-desc">Flip cards to test memory retention. Classify concepts as "Got It" or "Needs Practice".</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-primary btn-sm" id="btn-generate-flashcards">🃏 Generate Deck</button>
+            </div>
+          </div>
+
+          <div id="flashcards-deck-container" class="flashcards-deck-container">
+            <div class="empty-state">
+              <span class="empty-icon">🃏</span>
+              <h3>No Flashcards Loaded</h3>
+              <p>Click "Generate Deck" to produce interactive 3D concept flashcards from your material.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. CONTEXT-AWARE AI TUTOR -->
+        <section id="section-tutor" class="content-section">
+          <div class="section-header">
+            <div>
+              <h1>Context-Aware AI Tutor</h1>
+              <p class="section-desc">Ask questions strictly grounded in your study notes. Perfect for step-by-step doubt resolution.</p>
+            </div>
+          </div>
+
+          <div class="tutor-chat-card">
+            <!-- Starter Chips -->
+            <div class="starter-chips">
+              <span class="chip-label">Quick Prompts:</span>
+              <button class="chip" data-prompt="Explain this topic for 5 marks in an exam.">Explain for 5 marks</button>
+              <button class="chip" data-prompt="Give me a real-world example of this concept.">Give an example</button>
+              <button class="chip" data-prompt="What are the most common student mistakes in this chapter?">Common mistakes</button>
+              <button class="chip" data-prompt="What are the key formulas or rules I must memorize?">Key formulas</button>
+            </div>
+
+            <!-- Chat History Area -->
+            <div id="tutor-chat-history" class="tutor-chat-history">
+              <div class="chat-message assistant">
+                <div class="chat-avatar">🤖</div>
+                <div class="chat-bubble">
+                  <p>Hello! I am your AI Study Buddy Tutor. I am grounded in your currently active study notes. Ask me any question, request 5-mark answer templates, or click one of the quick prompts above!</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chat Input Bar -->
+            <form id="tutor-chat-form" class="tutor-input-bar">
+              <input type="text" id="tutor-input-text" placeholder="Ask a question about your study material..." required>
+              <button type="submit" class="btn btn-primary" id="btn-tutor-send">Send</button>
+            </form>
+          </div>
+        </section>
+
+        <!-- 8. DATE-AWARE STUDY PLANNER -->
+        <section id="section-planner" class="content-section">
+          <div class="section-header">
+            <div>
+              <h1>Date-Aware Study Planner</h1>
+              <p class="section-desc">Calculate calendar days remaining until your exam and get a balanced study/practice timetable.</p>
+            </div>
+          </div>
+
+          <div class="planner-config-card card">
+            <form id="planner-form" class="planner-form-grid">
+              <div class="form-group">
+                <label for="planner-exam-date">Target Exam Date:</label>
+                <input type="date" id="planner-exam-date" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="planner-daily-minutes">Daily Available Study Time (Minutes):</label>
+                <select id="planner-daily-minutes" class="form-control">
+                  <option value="60">60 Minutes (1 Hour)</option>
+                  <option value="90">90 Minutes (1.5 Hours)</option>
+                  <option value="120" selected>120 Minutes (2 Hours)</option>
+                  <option value="180">180 Minutes (3 Hours)</option>
+                  <option value="240">240 Minutes (4 Hours)</option>
+                </select>
+              </div>
+              <div class="form-group-btn">
+                <button type="submit" class="btn btn-primary" id="btn-generate-plan">📅 Generate Study Timetable</button>
+              </div>
+            </form>
+          </div>
+
+          <div id="planner-results-container" class="planner-results">
+            <!-- Rendered dynamically -->
+          </div>
+        </section>
+
+        <!-- 9. ADAPTIVE LAST-MINUTE EXAM MODE -->
+        <section id="section-exam" class="content-section">
+          <div class="section-header">
+            <div>
+              <h1>Adaptive Last-Minute Exam Crash Mode</h1>
+              <p class="section-desc">Emergency high-yield preparation mode. Dynamically optimizes focus for tight deadlines.</p>
+            </div>
+          </div>
+
+          <div class="exam-mode-selector card">
+            <div class="crash-tabs">
+              <button class="crash-tab-btn" data-hours="0.5">⚡ 30 Minutes Panic</button>
+              <button class="crash-tab-btn active" data-hours="2.0">🔥 2 Hours Standard</button>
+              <button class="crash-tab-btn" data-hours="6.0">🛡️ 6 Hours Deep Review</button>
+            </div>
+            <div class="custom-hours-wrapper">
+              <label for="exam-custom-hours">Or enter custom hours remaining:</label>
+              <input type="number" id="exam-custom-hours" min="0.5" max="48" step="0.5" value="2.0" class="form-control form-control-sm">
+              <button class="btn btn-primary btn-sm" id="btn-run-exam-mode">Activate Crash Plan</button>
+            </div>
+          </div>
+
+          <div id="exam-crash-container" class="exam-crash-container">
+            <!-- Rendered dynamically -->
+          </div>
+        </section>
+
+        <!-- 10. LEARNING PROGRESS & ANALYTICS -->
+        <section id="section-progress" class="content-section">
+          <div class="section-header">
+            <div>
+              <h1>Learning Progress & Analytics</h1>
+              <p class="section-desc">Comprehensive mastery overview, diagnostic weak/strong topics, and activity breakdown.</p>
+            </div>
+          </div>
+
+          <!-- Topics Diagnostic Breakdown -->
+          <div class="analytics-grid">
+            <div class="card">
+              <h2 class="sub-heading text-danger">⚠️ Weak Topics (Needs Revision)</h2>
+              <p class="text-muted">Topics identified from incorrect quiz responses.</p>
+              <div id="weak-topics-badges" class="topic-badges-container">
+                <span class="badge badge-warning">No weak topics recorded yet</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 class="sub-heading text-success">✅ Strong Topics (Mastered)</h2>
+              <p class="text-muted">Topics answered correctly in assessments.</p>
+              <div id="strong-topics-badges" class="topic-badges-container">
+                <span class="badge badge-success">No strong topics recorded yet</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mt-4">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <h2 class="sub-heading" style="margin: 0;">Global Activity History</h2>
+                <p class="text-muted" style="margin: 2px 0 0 0; font-size: 0.85rem;">Chronological log of document uploads, summaries, and quiz completions.</p>
+              </div>
+              <button class="btn btn-outline btn-sm text-danger" id="btn-clear-history" title="Clear all logged learning activities and quiz records">
+                🗑️ Clear History
+              </button>
+            </div>
+            <div id="analytics-activity-table" class="activity-table-wrapper">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Document Text Preview Modal -->
+  <div id="preview-modal" class="modal-overlay hidden">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="preview-modal-title">Document Preview</h3>
+        <button class="modal-close-btn" id="btn-close-preview">✕</button>
+      </div>
+      <div class="modal-body">
+        <pre id="preview-modal-text" class="preview-text"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Settings Modal -->
+  <div id="settings-modal" class="modal-overlay hidden">
+    <div class="modal-container" style="max-width: 600px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.5rem;">⚙️</span>
+          <div>
+            <h3 style="margin: 0; font-size: 1.15rem;">AI Configuration & API Keys</h3>
+            <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Configure Google Gemini and OpenAI keys for real-time AI reasoning</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btn-close-settings">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="settings-status-banner" class="alert alert-warning" style="margin-bottom: 20px; font-size: 0.85rem; padding: 12px 16px;">
+          <div class="alert-icon">🤖</div>
+          <div class="alert-body">
+            <strong>Active AI Engine:</strong> <span id="settings-active-engine-badge">Checking...</span>
+          </div>
+        </div>
+
+        <!-- Preferred Engine Selector -->
+        <div class="form-group">
+          <label class="form-label" for="settings-preferred-engine">Preferred AI Provider</label>
+          <select id="settings-preferred-engine" class="form-input" style="background-color: #fff; cursor: pointer;">
+            <option value="gemini">Google Gemini 1.5 Flash (Recommended - Free & Fast)</option>
+            <option value="openai">OpenAI GPT-4o-mini</option>
+          </select>
+          <div class="form-hint">Choose which provider to prioritize when processing summaries, quizzes, and tutoring.</div>
+        </div>
+
+        <!-- Google Gemini Key -->
+        <div class="form-group" style="margin-top: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" for="input-gemini-key" style="margin-bottom: 0;">Google Gemini API Key</label>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="font-size: 0.78rem; color: var(--primary); text-decoration: underline;">Get free Gemini key &rarr;</a>
+          </div>
+          <div class="input-with-button">
+            <input type="password" id="input-gemini-key" class="form-input" placeholder="Enter Gemini API key (AIzaSy...)">
+            <button class="btn btn-outline btn-sm" id="btn-toggle-gemini-visibility" type="button" title="Toggle visibility">👁️</button>
+            <button class="btn btn-outline btn-sm" id="btn-test-gemini" type="button">Test</button>
+          </div>
+          <div id="gemini-test-result" class="form-hint"></div>
+        </div>
+
+        <!-- OpenAI Key -->
+        <div class="form-group" style="margin-top: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" for="input-openai-key" style="margin-bottom: 0;">OpenAI API Key</label>
+            <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" style="font-size: 0.78rem; color: var(--primary); text-decoration: underline;">Get OpenAI key &rarr;</a>
+          </div>
+          <div class="input-with-button">
+            <input type="password" id="input-openai-key" class="form-input" placeholder="Enter OpenAI API key (sk-...)">
+            <button class="btn btn-outline btn-sm" id="btn-toggle-openai-visibility" type="button" title="Toggle visibility">👁️</button>
+            <button class="btn btn-outline btn-sm" id="btn-test-openai" type="button">Test</button>
+          </div>
+          <div id="openai-test-result" class="form-hint"></div>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 16px; margin-top: 20px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
+          💡 <strong>Offline Safe:</strong> If no API keys are entered or internet is disconnected, AI Study Buddy automatically operates with intelligent built-in heuristics without crashing.
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <button class="btn btn-outline btn-sm text-danger" id="btn-toggle-offline-mode" type="button" title="Work in offline mode without cloud AI">
+          Disconnect to Offline
+        </button>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-outline btn-sm" id="btn-cancel-settings">Cancel</button>
+          <button class="btn btn-primary btn-sm" id="btn-save-settings">💾 Save & Connect</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/materials.js"></script>
+  <script src="js/summary.js"></script>
+  <script src="js/questions.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/flashcards.js"></script>
+  <script src="js/tutor.js"></script>
+  <script src="js/planner.js"></script>
+  <script src="js/exam.js"></script>
+  <script src="js/progress.js"></script>
+</body>
+</html>

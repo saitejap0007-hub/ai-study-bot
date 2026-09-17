@@ -1,1 +1,1 @@
-# init
+# AI Study Buddy Backend Package
